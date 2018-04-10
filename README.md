@@ -4,7 +4,7 @@ This is a tic-tac-toe console game written in C++.
 
 ## Motivation
 
-I made this game program just as an exercize to learn C++.
+I made this game program just as an exercise to learn C++.
 
 
 ## The game
