@@ -32,6 +32,7 @@ Tested in Linux Ubuntu 16.04 with g++ 5.4.0.
 Open your Linux terminal and clone the game repository:
 ```
 git clone https://github.com/pt1k/Tic-tac-toe.git
+```
 
 Move to the game directory:
 ```
