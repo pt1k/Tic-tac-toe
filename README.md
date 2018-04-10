@@ -18,7 +18,7 @@ optimally, the game ends to a draw.
 
 ## Getting Started
 
-Just extract the zip, compile, and run the game executable on your Linux computer.
+Clone the Tic-tac-toe repository, compile, and run the game executable on your Linux computer.
 
 ### Prerequisites
 
@@ -29,16 +29,13 @@ Tested in Linux Ubuntu 16.04 with g++ 5.4.0.
 
 ### Installing
 
-Save the project file ttt.zip to your computer and open Linux terminal on that directory.
-Then extract the project from the saved ttt.zip:
+Open your Linux terminal and clone the game repository:
+```
+git clone https://github.com/pt1k/Tic-tac-toe.git
 
+Move to the game directory:
 ```
-unzip ttt.zip
-```
-
-Move to the project directory:
-```
-cd ttt
+cd Tic-tac-toe
 ```
 Compile to produce executable:
 ```
