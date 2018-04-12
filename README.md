@@ -1,6 +1,6 @@
 # Tic-tac-toe console game
 
-This is a tic-tac-toe console game written in C++.
+This is an unbeatable tic-tac-toe console game written in C++.
 
 ## Motivation
 
