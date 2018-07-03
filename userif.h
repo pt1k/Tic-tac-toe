@@ -10,7 +10,7 @@
 #define USERIF_H
 
 /**
- * User interface class for console i/o.
+ * User interface class.
  */
 class UserIf 
 {
@@ -19,21 +19,21 @@ class UserIf
     /**
      * Constructor.
      */
-    UserIf() {};
+   // UserIf() {};
 
     /**
      * Ask player's name from the user.
      * @param playerNumber the order number of the player
      * @return the name entered by the user
      */
-    string askPlayerName(int playerNumber) const;
+    virtual string askPlayerName(int playerNumber) const = 0;
 
     /** 
      * Ask from the user if the player is computer/machine or human.
      * @return true:  player is computer/machine. 
      *         false: player is human
      */
-    bool askIfMachine(void) const;
+    virtual bool askIfMachine(void) const = 0;
     
     /**
      * Ask next move from the player.
@@ -43,24 +43,24 @@ class UserIf
      * @param preferred preferred move, just a hint to the user for best move
      * @return answer the user entered
      */
-    int askMove(const boardMtx__t& mtx, char symbol, std::string& name, int preferred);
+    virtual int askMove(const boardMtx__t& mtx, char symbol, std::string& name, int preferred) = 0;
 
     /** 
      * Ask from the user if they want to play again.
      * @return true: they want to play again. false: they want to quit playing
      */
-    bool askToPlayAgain(void);
+    virtual bool askToPlayAgain(void) = 0;
 
     /**
      * Clear the screen for a new game.
      */
-    void clear(void);
+    virtual void clear(void) = 0;
 
     /**
      * Display the game board on the screen.
      * @param mtx game board with symbols
      */
-    void showBoard(const boardMtx__t& mtx);
+    virtual void showBoard(const boardMtx__t& mtx) = 0;
 
     /**
      * Display scores on the screen.
@@ -70,7 +70,16 @@ class UserIf
      * @param name1 name of the player 2
      * @param score1 score of the player 2
      */
-     void showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2);
+    virtual void showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2) = 0;
+
+    /**
+     * Destructor.
+     */
+    virtual ~UserIf(){};
+    
+  private:
+    int x;
+    
 };
 
 #endif

@@ -12,7 +12,7 @@ SRCS := $(wildcard *.cc)
 # $(patsubst %.cc,%.o,$(SRCS)): substitute all ".cc" file name strings to ".o" file name strings
 OBJS := $(patsubst %.cc,%.o,$(SRCS))
 
-DEPS := $(SRCS:.cc=.depends)
+DEPS := $(SRCS:.cc=.d)
 
 
 
@@ -26,7 +26,7 @@ $(TARGET): $(OBJS)
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-%.depends: %.cc
+%.d: %.cc
 	$(CXX) -MM $(CXXFLAGS) $< > $@
 
 -include $(DEPS)

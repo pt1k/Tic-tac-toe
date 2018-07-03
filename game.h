@@ -16,7 +16,7 @@
  * The game class.
  */
 
-class Game : public Player, public UserIf
+class Game : public Player
 {
   private:
     UserIf *ui;

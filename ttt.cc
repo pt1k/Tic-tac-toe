@@ -15,7 +15,7 @@ using namespace std;
 #include <array>
 
 #include "ttt.h"
-#include "userif.h"
+#include "console.h"
 #include "game.h"
 #include "engine.h"
 
@@ -31,12 +31,17 @@ int main(int argc, char **argv)
 
     testRules();
     
-    UserIf ui;
-    Game game(&ui);
-    Engine engine(&game, &ui);
+    UserIf *ui = new Console();
+    //Console ui;
+    //Game game(ui);
+    Game *game = new Game(ui);
+    Engine engine(game, ui);
     
     while (engine.start());
 
+    delete game;
+    delete ui;
+    
     return EXIT_SUCCESS;
 }
     
