@@ -19,7 +19,7 @@ class UserIf
     /**
      * Constructor.
      */
-   // UserIf() {};
+    UserIf() {};
 
     /**
      * Ask player's name from the user.
@@ -76,9 +76,6 @@ class UserIf
      * Destructor.
      */
     virtual ~UserIf(){};
-    
-  private:
-    int x;
     
 };
 
