@@ -1,32 +1,38 @@
 /**
- * @file    userif.h
+ * @file    gui.h
  * @author  Pekka Koivuniemi
- * @date    6 April 2018
+ * @date    20 April 2018
  * @version 0.1
- * @brief   Definitions for user interface.
+ * @brief   Definitions for graphical user interface.
  */
 
-#ifndef USERIF_H
-#define USERIF_H
+#ifndef GUI_H
+#define GUI_H
+
+#include <iostream>
+
+#include "curse.h"
+#include "userif.h"
 
 /**
- * User interface class.
+ * User interface class for graphical i/o.
  */
-class UserIf 
+class Gui: public Curse, public UserIf
 {
     
   public:
     /**
      * Constructor.
      */
-    UserIf() {};
+    Gui() {};
 
     /**
      * Ask player's name from the user.
      * @param playerNumber the order number of the player
      * @return the name entered by the user
      */
-    virtual std::string askPlayerName(int playerNumber) = 0;
+    std::string askPlayerName(int playerNumber);
+    /**/
 
     /** 
      * Ask from the user if the player is computer/machine or human.
@@ -34,14 +40,15 @@ class UserIf
      * @return true:  player is computer/machine. 
      *         false: player is human
      */
-    virtual bool askIfMachine(int playerNumber) = 0;
+    bool askIfMachine(int playerNumber);
 
     /**
      * Set next player's turn
      * It can be a human or machine.
      * @param symbol next player's playing symbol
      */
-    virtual void setTurn(char symbol) = 0;
+    void setTurn(char symbol);
+
     
     /**
      * Ask next move from the player.
@@ -49,28 +56,29 @@ class UserIf
      * @param symbol player's game symbol
      * @param name player's name
      * @param preferred preferred move, just a hint to the user for best move
-     * @return answer the user entered
+     * @return cell number [1,9] on the game board 
+     *         or 0 if user wants to quit the game
      */
-    virtual int askMove(const boardMtx__t& mtx, char symbol, std::string& name, int preferred) = 0;
+    int askMove(const boardMtx__t& mtx, char symbol, std::string& name, int preferred);
 
     /** 
      * Ask from the user if they want to play again.
      * @return true: they want to play again. false: they want to quit playing
      */
-    virtual bool askToPlayAgain(void) = 0;
+    bool askToPlayAgain(void);
 
     /**
      * Clear the screen for a new game.
      */
-    virtual void clear(void) = 0;
+    void clear(void);
 
     /**
      * Display the game board on the screen.
      * @param mtx game board with symbols
      * @param winLine cell indicies [0,8] of the winning line
      *                if no winning line, indicies are -1
-     */
-    virtual void showBoard(const boardMtx__t& mtx, winLine__t& winLine) = 0;
+    */
+    void showBoard(const boardMtx__t& mtx, winLine__t& winLine);
 
     /**
      * Display scores on the screen.
@@ -80,13 +88,7 @@ class UserIf
      * @param name1 name of the player 2
      * @param score1 score of the player 2
      */
-    virtual void showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2) = 0;
-
-    /**
-     * Destructor.
-     */
-    virtual ~UserIf(){};
-    
+    void showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2);
 };
 
 #endif

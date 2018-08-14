@@ -36,7 +36,12 @@ class Game : public Player
     /** 
      * Constructor 
      */
-    Game(UserIf *p_ui) : ui(p_ui) { /*printf("Game(ui) ..\n"); */ drawnMatches = 0; gameState = STARTING__C; };
+    Game(UserIf *p_ui) : ui(p_ui) { /*printf("Game(ui) ..\n"); */ };
+
+    /**
+     * Clear the counter of drawn matches
+     */
+    void clearDrawnMatches(void);
 
     /**
      * Initialize the game board, needed at the beginning of the game.
@@ -62,6 +67,7 @@ class Game : public Player
      * @param players array of the players
      */
     void update(players__t& players);
+
 };
 
 #endif

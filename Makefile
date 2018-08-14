@@ -2,7 +2,7 @@ CXX := g++
 CXXFLAGS := -Wall -g -std=c++11
 TARGET := ttt
 #LFLAGS := -ggdb
-LFLAGS := 
+LFLAGS := -lncurses
 RM := rm -f
 
 CXXEXT	 = cc
@@ -29,7 +29,7 @@ all: $(TARGET)
 #	@echo "DEPS: " $(DEPS)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LFLAGS) $(OBJS) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJS) $(LFLAGS) -o $(TARGET)
 
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(CXXEXT)
 	@mkdir -p $(dir $@)

@@ -20,6 +20,14 @@ using namespace std;
 #include "computermove.h"
 
 /**
+ * Clear the counter of drawn matches
+ */
+void Game::clearDrawnMatches(void)
+{
+    drawnMatches = 0;
+}
+
+/**
  * Mark all cells free and set the game state to 'starting'.
  */
 void Game::initBoard(void)
@@ -28,6 +36,7 @@ void Game::initBoard(void)
         mtx[i] = n__C;
 
     gameState = STARTING__C;
+    std::fill(winLine.begin(), winLine.end(), -1);
 }
 
 /**
@@ -36,13 +45,16 @@ void Game::initBoard(void)
 bool Game::makeMove(Player *player)
 {
     int move;
+    auto symbol = player->getSymbol();
+
+    ui->setTurn(symbol);
 
     do {
-        int preferred = compMove(mtx, player->getSymbol());
+        int preferred = compMove(mtx, symbol);
         if (player->isMachine()) 
             move = preferred;
         else 
-            move = ui->askMove(mtx, player->getSymbol(), player->getName(), 0 /*preferred*/);
+            move = ui->askMove(mtx, symbol, player->getName(), 0 /*preferred*/);
         if (move == TERMINATE__C)
             return false;
         
@@ -71,7 +83,7 @@ void Game::update(players__t& players)
     ui->showScores(players[0]->getName(), players[0]->getScore(),
                    drawnMatches,
                    players[1]->getName(), players[1]->getScore());
-    ui->showBoard(mtx);
+    ui->showBoard(mtx, winLine);
 }
 
 /**

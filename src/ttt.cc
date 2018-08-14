@@ -16,6 +16,7 @@ using namespace std;
 
 #include "ttt.h"
 #include "console.h"
+#include "gui.h"
 #include "game.h"
 #include "engine.h"
 
@@ -31,7 +32,8 @@ int main(int argc, char **argv)
 
     testRules();
     
-    UserIf *ui = new Console();
+    //UserIf *ui = new Console();
+    UserIf *ui = new Gui();
     //Console ui;
     //Game game(ui);
     Game *game = new Game(ui);

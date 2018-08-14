@@ -28,15 +28,23 @@ class Console: public UserIf
      * @param playerNumber the order number of the player
      * @return the name entered by the user
      */
-    string askPlayerName(int playerNumber) const;
+    std::string askPlayerName(int playerNumber) const;
 
     /** 
      * Ask from the user if the player is computer/machine or human.
+     * @param playerNumber the order number of the player
      * @return true:  player is computer/machine. 
      *         false: player is human
      */
-    bool askIfMachine(void) const;
+    bool askIfMachine(int playerNumber) const;
     
+    /**
+     * Set next player's turn
+     * It can be a human or machine.
+     * @param playerNumber next player's number [0,NUM_PLAYERS)
+     */
+    void setTurn(int playerNumber);
+
     /**
      * Ask next move from the player.
      * @param mtx game board with symbols

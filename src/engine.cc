@@ -23,7 +23,7 @@ void Engine::createPlayers(void)
 {
     for(size_t i = 0; i < players.size(); i++) {
         std::string playerName = ui->askPlayerName(i + 1);
-        bool machine = ui->askIfMachine();
+        bool machine = ui->askIfMachine(i + 1);
         players[i] = new Player(playerName, i==0 ? X__C : O__C, machine);
     }
 }
@@ -80,6 +80,7 @@ bool Engine::start(void)
     //printf("Engine::start..\n");
     
     createPlayers();
+    game->clearDrawnMatches();
     srand (time(NULL));
     
     int starter = 0;
@@ -88,6 +89,7 @@ bool Engine::start(void)
     }
 
     deletePlayers();
+    ui->clear();
             
     return ui->askToPlayAgain();
 }

@@ -10,7 +10,7 @@
 #define TTT_H
 
 #include <array>
-#include <vector>
+//#include <vector>
 
 #define NUM_PLAYERS 2                               ///< The game needs exactly two players
 

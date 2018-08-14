@@ -32,7 +32,7 @@ string Console::askPlayerName(int playerNumber) const
 /** 
  * Ask from the user if the player is computer/machine or human.
  */
-bool Console::askIfMachine(void) const
+bool Console::askIfMachine(int playerNumber) const
 {
     std::string answer;
     
@@ -76,6 +76,15 @@ bool Console::askToPlayAgain(void)
     std::cin >> answer;
     
     return (toupper(answer) == 'Y');
+}
+
+/**
+ * Set next player's turn
+ * We do nothing with it.
+ */
+void Console::setTurn(int playerNumber) 
+{
+    return;
 }
 
 /**
