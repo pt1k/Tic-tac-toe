@@ -41,7 +41,7 @@ class Console: public UserIf
     /**
      * Set next player's turn
      * It can be a human or machine.
-     * @param playerNumber next player's number [0,NUM_PLAYERS)
+     * @param symbol next player's playing symbol
      */
     void setTurn(char symbol);
 
