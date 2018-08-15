@@ -82,7 +82,7 @@ bool Console::askToPlayAgain(void)
  * Set next player's turn
  * We do nothing with it.
  */
-void Console::setTurn(int playerNumber) 
+void Console::setTurn(char symbol) 
 {
     return;
 }

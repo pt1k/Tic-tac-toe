@@ -43,7 +43,7 @@ class Console: public UserIf
      * It can be a human or machine.
      * @param playerNumber next player's number [0,NUM_PLAYERS)
      */
-    void setTurn(int playerNumber);
+    void setTurn(char symbol);
 
     /**
      * Ask next move from the player.
