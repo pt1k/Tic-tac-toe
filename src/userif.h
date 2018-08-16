@@ -67,10 +67,8 @@ class UserIf
     /**
      * Display the game board on the screen.
      * @param mtx game board with symbols
-     * @param winLine cell indicies [0,8] of the winning line
-     *                if no winning line, indicies are -1
      */
-    virtual void showBoard(const boardMtx__t& mtx, winLine__t& winLine) = 0;
+    virtual void showBoard(const boardMtx__t& mtx) = 0;
 
     /**
      * Display scores on the screen.
@@ -81,6 +79,18 @@ class UserIf
      * @param score1 score of the player 2
      */
     virtual void showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2) = 0;
+
+    /**
+     * Display game result (winner or draw, winning line).
+     * @param winLine winning line indices [0,8] on the game board
+     */
+    virtual void showGameResult(winLine__t& winLine) = 0;
+
+    /**
+     * Ask for an user interaction to start a new game.
+     * @return true for a new game, false to quit
+     */
+    virtual bool askReadyForNewGame() = 0;
 
     /**
      * Destructor.

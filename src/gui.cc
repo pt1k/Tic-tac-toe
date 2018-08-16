@@ -7,9 +7,6 @@
  */
 
 #include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
 
 #include "ttt.h"
 #include "gui.h"
@@ -47,11 +44,10 @@ void Gui::setTurn(char symbol)
 int Gui::askMove (const boardMtx__t& mtx, char symbol, std::string& name, int preferred)
 {
     int move;
-    selectionType selType;
 
     Curse::setTurn(symbol);
 
-    Curse::getSelection(move, selType);
+    move = Curse::getMove();
     
     if (move == 'q' || move == 'Q')
         move = TERMINATE__C;
@@ -80,9 +76,9 @@ void Gui::clear(void)
 /**
  * Display the game board on the screen.
  */
-void Gui::showBoard(const boardMtx__t& pm, winLine__t& wl) 
+void Gui::showBoard(const boardMtx__t& pm) 
 {
-    Curse::showBoard(pm, wl);
+    Curse::showBoard(pm);
 }
 
 /**
@@ -92,4 +88,21 @@ void Gui::showScores(const std::string& name1, int score1, int draws, const std:
 {
     Curse::showScores(name1, score1, draws, name2, score2);
 }
+
+/**
+ * Display game result (winner or draw, winning line).
+ */
+void Gui::showGameResult(winLine__t& winLine)
+{
+    Curse::showGameResult(winLine);
+}
+
+/**
+ * Ask for an user interaction to start a new game.
+ */
+bool Gui::askReadyForNewGame()
+{
+    return Curse::askReadyForNewGame();
+}
+
 

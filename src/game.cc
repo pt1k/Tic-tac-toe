@@ -59,7 +59,7 @@ bool Game::makeMove(Player *player)
             return false;
         
     } while (!setMove(player, move));
-    
+
     return true;
 }
 
@@ -83,7 +83,11 @@ void Game::update(players__t& players)
     ui->showScores(players[0]->getName(), players[0]->getScore(),
                    drawnMatches,
                    players[1]->getName(), players[1]->getScore());
-    ui->showBoard(mtx, winLine);
+    ui->showBoard(mtx);
+
+    if (gameState == GOT_WINNER__C ||
+        gameState == DRAWN_MATCH__C)
+        ui->showGameResult(winLine);
 }
 
 /**

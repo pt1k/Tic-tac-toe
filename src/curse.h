@@ -20,28 +20,12 @@ class Curse
 {
 
 public:
-    enum key {
-        ESC = 27
-    };
 
-    enum selectionType {
-        BTN1_PRESSED,   
-        BTN1_RELEASED,  
-        BTN1_SINGLE_CLICK,   
-        BTN1_DOUBLE_CLICK,
-        KEYBOARD,
-        UNKNOWN_SELECTION,
-    };
-    
-    enum cellAttribute {
-        NORMAL,
-        REVERSE,
-        HIGHLIGHT,
-        WIN,
-        DRAW,
-        LOSE
-    };
-    
+    /**
+     * Ask player's name from the user.
+     * @param playerNumber the order number of the player
+     * @return the name entered by the user
+     */
     std::string askPlayerName(int playerNumber);
 
     /** 
@@ -51,17 +35,6 @@ public:
      *         false: player is human
      */
     virtual bool askIfMachine(int playerNumber);
-
-    /**
-     * Ask next move from the player.
-     * @param mtx game board with symbols
-     * @param symbol player's game symbol
-     * @param name player's name
-     * @param preferred preferred move, just a hint to the user for best move
-     * @return answer the user entered
-     * /
-    int askMove(const boardMtx__t& mtx, char symbol, std::string& name, int preferred);
-    */
 
     /** 
      * Ask from the user if they want to play again.
@@ -84,10 +57,8 @@ public:
     /**
      * Display the game board on the screen.
      * @param mtx game board with symbols
-     * @param winLine cell indicies [0,8] of the winning line
-     *                if no winning line, indicies are -1
      */
-    virtual void showBoard(const boardMtx__t& mtx, winLine__t& winLine);
+    virtual void showBoard(const boardMtx__t& mtx);
 
     /**
      * Display scores on the screen.
@@ -101,30 +72,22 @@ public:
 
     /**
      * Get cell selection on the game board done by the user with mouse.
-     * @param data the cell number (0-8) on the game board selected by user
-     *             or ESC key from keyboard
-     * @param sel which kind of selection the user made
+     * @return cell number [0,8] on the game board selected by user
+     *         or 'Q' or 'q' from keyboard to quit
      */
-    void getSelection(int& data, selectionType& sel);
+    int getMove(void);
     
     /**
-    * Set attribute (e.g. color, inverse video) of given cells.
-    * @param cells vector of cell numbers [0-8] on the game board
-    * @param attr attribute to set for the given cells
-    */
-    void setCellsAttr(std::vector<int> cell, cellAttribute attr);
-    
+     * Display game result (winner or draw, winning line).
+     * @param winLine winning line indices [0,8] on the game board
+     */
+    void showGameResult(winLine__t& winLine);
+
     /**
-     * Set playing symbol to the given cell.
-     * @param cell the cell number (0-8) on the game board
-     * @param symbol playing symbol ('X', 'O' or ' ', or whatever char)
+     * Ask for an user interaction to start a new game.
+     * @return true for a new game, false to quit
      */
-    void setCellSymbol(int cell, char symbol);
-    
-    /** 
-     * Set ' ' with normal attributes to all cells.
-     */
-    void clearCells(void);
+    bool askReadyForNewGame();
 
     Curse(void)  { initCurse(); }
     ~Curse(void) { endCurse(); }
@@ -169,9 +132,10 @@ private:
     int  getCellNumber(int y, int x);
     void getGridCoords(int cell, int& gridy, int& gridx);
     void updateBoard(const boardMtx__t& board);
+    void setCellsColor(std::vector<int>& cells, int colorPair);
     void showWinningLine(winLine__t& wl);
-    void showUserWindow(userWin_t&);
-    void showDrawWindow(void);
+    void showUserWindow(userWin_t&, const char*);
+    void showDrawWindow(const char*);
     int  playerNumberBySymbol(char symbol);
 
     

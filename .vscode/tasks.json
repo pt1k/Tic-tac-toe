@@ -18,13 +18,22 @@
             "command": "make clean",
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             }
         },
         {
-            "label": "Run ./ttt",
+            "label": "RUN ./ttt",
             "type": "shell",
             "command": "${workspaceFolder}/ttt",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "RUN ./ttt console",
+            "type": "shell",
+            "command": "${workspaceFolder}/ttt console",
             "group": {
                 "kind": "test",
                 "isDefault": true

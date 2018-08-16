@@ -28,7 +28,7 @@ class Console: public UserIf
      * @param playerNumber the order number of the player
      * @return the name entered by the user
      */
-    std::string askPlayerName(int playerNumber) const;
+    std::string askPlayerName(int playerNumber);
 
     /** 
      * Ask from the user if the player is computer/machine or human.
@@ -36,7 +36,7 @@ class Console: public UserIf
      * @return true:  player is computer/machine. 
      *         false: player is human
      */
-    bool askIfMachine(int playerNumber) const;
+    bool askIfMachine(int playerNumber);
     
     /**
      * Set next player's turn
@@ -69,7 +69,7 @@ class Console: public UserIf
     /**
      * Display the game board on the screen.
      * @param mtx game board with symbols
-     */
+    */
     void showBoard(const boardMtx__t& mtx);
 
     /**
@@ -81,6 +81,21 @@ class Console: public UserIf
      * @param score1 score of the player 2
      */
     void showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2);
+
+    /**
+     * Ask for an user interaction to start a new game.
+     * @return 'q' or 'Q' or '0' to quit,
+     *         any other for a new game
+     */
+
+    /**
+     * Display game result (winner or draw, winning line).
+     * @param winLine winning line indices [0,8] on the game board
+     */
+    void showGameResult(winLine__t& winLine);
+
+    bool askReadyForNewGame();
+
 };
 
 #endif

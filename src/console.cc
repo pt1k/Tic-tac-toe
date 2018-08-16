@@ -19,7 +19,7 @@ using namespace std;
 /**
  * Ask player's name from the user.
  */
-string Console::askPlayerName(int playerNumber) const
+string Console::askPlayerName(int playerNumber)
 {
     std::string name;
     
@@ -32,7 +32,7 @@ string Console::askPlayerName(int playerNumber) const
 /** 
  * Ask from the user if the player is computer/machine or human.
  */
-bool Console::askIfMachine(int playerNumber) const
+bool Console::askIfMachine(int playerNumber)
 {
     std::string answer;
     
@@ -125,3 +125,26 @@ void Console::showScores(const std::string& name1, int score1, int draws, const 
     printf("\n\n\t%s: %d  Draws: %d  %s: %d\n\n", name1.data(), score1, draws, name2.data(), score2);
 }
 
+/**
+ * Display game result.
+ */
+void Console::showGameResult(winLine__t& winLine)
+{
+    // nothing to do so far
+    return;
+}
+
+
+
+/**
+ * Ask for an user interaction to start a new game.
+ */
+bool Console::askReadyForNewGame() {
+
+    char answer;
+    
+    std::cout << std::endl << "Game over. Play a new game (Y/N): ";
+    std::cin >> answer;
+
+    return (toupper(answer) == 'Y');
+}

@@ -13,6 +13,7 @@ using namespace std;
 #include <cstdlib>
 #include <vector>
 #include <array>
+#include <cstring>
 
 #include "ttt.h"
 #include "console.h"
@@ -27,15 +28,17 @@ extern void testRules();
  * The main function of the Tic-tac-toe game.
  * Create the objects needed and start the game engine.
  */
-int main(int argc, char **argv) 
+int main(int argc, const char* argv[]) 
 {
 
     testRules();
+
+    UserIf* ui;
+    if (argc >= 2 && argv[1] == std::string("console"))
+        ui = new Console();
+    else
+        ui = new Gui();
     
-    //UserIf *ui = new Console();
-    UserIf *ui = new Gui();
-    //Console ui;
-    //Game game(ui);
     Game *game = new Game(ui);
     Engine engine(game, ui);
     

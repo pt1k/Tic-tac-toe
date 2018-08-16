@@ -11,6 +11,11 @@ DEPEXT	 = d
 SRCDIR   = src
 BUILDDIR = build
 
+#ifeq (0,$(gui))
+# xxx = "gui == 0"
+#else 
+# xxx = "gui != 0"
+#endif
 
 # $(wildcard xxx/*.cc): get all .cc files in the directory xxx/"
 SRCS := $(wildcard $(SRCDIR)/*.$(CXXEXT))
@@ -24,6 +29,7 @@ DEPS := $(OBJS:.$(OBJEXT)=.$(DEPEXT))
 .PHONY: clean all
 
 all: $(TARGET)
+#	@echo "xxx: " $(xxx)
 #	@echo $(SRCS)
 #	@echo "OBJS: " $(OBJS)
 #	@echo "DEPS: " $(DEPS)

@@ -9,7 +9,7 @@
             "name": "(gdb) Attach",
             "type": "cppdbg",
             "request": "attach",
-            "program": "/home/pk/git/Tic-tac-toe/ttt",
+            "program": "${workspaceFolder}/ttt",
             "processId": "${command:pickProcess}",
             "MIMode": "gdb",
             "setupCommands": [
@@ -24,7 +24,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/pk/git/Tic-tac-toe/ttt",
+            "program": "${workspaceFolder}/ttt",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

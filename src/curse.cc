@@ -1,4 +1,3 @@
-// file: ~/Coding/tttGUI/gui.cc
 /**
  * @file    curse.cc
  * @author  Pekka Koivuniemi
@@ -11,8 +10,6 @@
 #include <vector>
 #include <cassert>
 #include <cstring>
-#include <chrono>
-#include <thread>
 
 #include "curse.h"
 
@@ -62,21 +59,23 @@ const size_t GRID_WIN_Y = 3;
 
 const size_t USER1_WIN_Y = GRID_WIN_Y + GROWS + 1;
 const size_t USER2_WIN_Y = GRID_WIN_Y + GROWS + 1;
-const size_t USER_WIN_LEN_Y = 3;
+const size_t USER_WIN_LEN_Y = 4;
 const size_t USER_WIN_LEN_X = 10;
-// Calculate startX-coord of each player's window
-// We use #define as it can change at run time by screen resize
-// Player1: Let its center be at 1/4 of the width of the screen
-#define USER1_WIN_X (COLS/4 - USER_WIN_LEN_X/2)
-// Player2: Let its center be at 3/4 of the width of the screen
-#define USER2_WIN_X (3*COLS/4 - USER_WIN_LEN_X/2)
 
 /*************  Draw window  *************/
 
 const size_t DRAW_WIN_Y = USER1_WIN_Y + 1;
-const size_t DRAW_WIN_LEN_Y = 2;
+const size_t DRAW_WIN_LEN_Y = 3;
 const size_t DRAW_WIN_LEN_X = 5;
 #define DRAW_WIN_X (COLS/2 - DRAW_WIN_LEN_X/2)
+
+// *** Calculate startX-coord of each player's window ***
+// We use #define as it can change at run time by screen resize
+// Player1: Let its right side be at 8 chars from draw window's left side 
+#define USER1_WIN_X (DRAW_WIN_X - 8 - USER_WIN_LEN_X)
+// Player2: Let its left side be at 8 chars from draw window's right side 
+#define USER2_WIN_X (DRAW_WIN_X + DRAW_WIN_LEN_X + 8)
+
 
 // Color pairs
 const int COLOR_NORMAL      = 1;
@@ -88,172 +87,55 @@ const int COLOR_LOSE        = 6;
 
 
 // Area for some debug info
-const size_t NUM_INFO_LINES = 5;
+const size_t NUM_INFO_LINES = 3;
 #define INFO_Y LINES - NUM_INFO_LINES
 
 /*************  Query window  *************/
-
+// ...
 /***/
 
-/**
- * Stop program execution for a while
- * @param ms delay time in milliseconds
- */
-void sleepMilliseconds(int ms)
-{
-    napms(ms);
-}
+/*** non-class member functions ***/
 
+void sleepMilliseconds(int ms);
+void purgeInput(void);
+void initColors(void);
 
-/**
- * Get cell selection on the game board done by the user with mouse.
- * @param data returned selected cell number [0,8]
- * @param sel returned selection type
- */
-void Curse::getSelection(int& data, selectionType& sel)
-{
+/*************************************************************************/
 
-    data = -1;
-    sel = (selectionType)0;
-    bool done = false;
-    while(!done) {
-        MEVENT event;
-        int ch = wgetch(stdscr);
-        data = ch;
-        switch(ch) {
-            case KEY_MOUSE:
-                if(getmouse(&event) == OK) {
-                    /* When the user makes some mouse click */
-                    data = getCellNumber(event.y, event.x);
-                    sel = //event.bstate & BUTTON1_PRESSED         ? BTN1_PRESSED      :
-                          //event.bstate & BUTTON1_RELEASED        ? BTN1_RELEASED     :
-                          event.bstate & BUTTON1_CLICKED         ? BTN1_SINGLE_CLICK :
-                          //event.bstate & BUTTON1_DOUBLE_CLICKED  ? BTN1_DOUBLE_CLICK :
-                          UNKNOWN_SELECTION;
-                } else {
-                    sel = UNKNOWN_SELECTION;
-                }
-                break;
-            default:
-                sel = KEYBOARD;
-                break;
-        }
-        mvprintw(INFO_Y, 1, "sel=%d bstate=0x%x data=%d    ", 
-                sel, event.bstate,data);
-        if (sel == BTN1_SINGLE_CLICK && data >=0)
-            done = true;
-        if (sel == KEYBOARD) {
-            if (data >= '1' && data <= '9') {
-                data -= '1'; // -> binary [0,8]
-                done = true;
-            } 
-            else if (data == 'q' || data == 'Q')
-                done = true;
-        }
-    }
-    
-}
-                          
-/**
- * Set attribute (e.g. color, inverse video) of given cells.
- * @param cells vector of cell numbers [0,8] on the game board
- * @param attr attribute to set for the given cells
- */
-void Curse::setCellsAttr(std::vector<int> cells, cellAttribute attr)
+/*
+ * Initialize curses mode 
+ */ 
+void Curse::initCurse(void)
 {
-    attr_t wAttr  = attr == REVERSE ? A_REVERSE : A_NORMAL;
-    int colorPair = attr == HIGHLIGHT ? COLOR_HIGHLIGHT :
-                    attr == WIN       ? COLOR_WIN       :
-                    attr == DRAW      ? COLOR_DRAW      :
-                    attr == LOSE      ? COLOR_LOSE      :
-                                        COLOR_NORMAL;
-    for (auto cell : cells) {
-        int winy, winx;
-        getGridCoords(cell, winy, winx);
-        mvwchgat(gridWin.subWin.win, winy, winx-1, 3, wAttr, colorPair, NULL);
-    }
-    wrefresh(gridWin.subWin.win);
+    initscr();          // Start curses mode
+    start_color();      // Start the color functionality
+    cbreak();           // Line buffering disabled
+    keypad(stdscr, TRUE); // Needed?
+    noecho();           // echo off
+
+    //showColors();
+
+    initColors();
+    attron(COLOR_PAIR(1));
+
+    createSubWindows();
+    purgeInput();
 }
 
 /**
- * Set a symbol (X, O or ' ') to the given cell.
- * Show it on the screen.
- * @param cell cell number [0,8] on the game board
- * @param symbol symbol (X, O or ' ') to show
+ * End curses mode, i.e. restore normal terminal
  */
-void Curse::setCellSymbol(int cell, char symbol)
+void Curse::endCurse(void)
 {
-    assert(cell >= 0 && cell < (int)CELLS);
-    int winy, winx;
-    getGridCoords(cell, winy, winx);
-    mvwaddch(gridWin.subWin.win, winy, winx, symbol);
-    wrefresh(gridWin.subWin.win);
-}    
-
-/**
- * Clear the game board on the screen, i.e. put ' ' to the cells.
- * /
-void Curse::clearCells(void)
-{
-    for (int cell = 0; cell < (int)CELLS; cell++) {
-        setCellAttr(cell, NORMAL);
-        setCellSymbol(cell, F);
-    }
+    endwin();
 }
-*/        
-    
-    
-#if 0
-        
-        
-    if (cellAttr(cell)
-    wattr = attr == NORMAL ? A_NORMAL :
-            attr == REVERSE = A_REVERSE :
-    int winy, winx;
-    
-    getGridCoords(boardSlot, winy, winx);
-    mvwchgat(gridWin.win, winy, winx-1, 3, A_REVERSE, 0, NULL);
-    wrefresh(gridWin.win);
-    
-                          if (event.bstate & BTN1_PRESSED)
-                        sel = BTN1_PRESSED;
-                    else if (event.bstate & BTN1_PRESSED)
-                        sel = BTN1_PRESSED;
-                    else if (event.bstate & BUTTON1_CLICKED)
-                        sel = BTN1_SINGLE_CLICK;
-                    else 
-                        if (boardSlot >= 0) {
-                            int winy, winx;
-                            getGridCoords(boardSlot, winy, winx);
-                            mvwchgat(gridWin.win, winy, winx-1, 3, A_REVERSE, 0, NULL);
-                            wrefresh(gridWin.win);
-                            //mvwscanw(gridWin.win, winy, winx, "%c", &c2);
-                        }
-                        mvprintw(5, 1, "btn1 click         ");
-                    } 
-                    else {
-                        mvprintw(5, 1, "mouse event %x", event.bstate);
-                    }
-                    printw("\n   at y=%d x=%d cell=%d     ", event.y, event.x, boardSlot);
-                    //mvprintw(LINES -2, 0, buf);
-                }
-                else {
-                    mvprintw(5, 1, "getmouse() != OK      ");
-                }
-                refresh();
-                break;
-            default:
-                break;
-        }
-    }
-#endif    
 
 /**
  * A help funtion to show colors on the screen.
  * Just to see how each color look like.
  * Not used in final version.
  */
-
+#if 0
 void showColors(void)
 {
     const char *cname[] = {
@@ -296,7 +178,7 @@ void showColors(void)
     //refresh();
     getch();
 }
-
+#endif
 /**
  * Initialize color pairs
  */
@@ -309,57 +191,6 @@ void initColors(void)
     init_pair(COLOR_DRAW,      COLOR_BLACK, COLOR_YELLOW);
     init_pair(COLOR_LOSE,      COLOR_BLACK, COLOR_RED);
 }
-/*
- * Initialize curses mode 
- */ 
-void Curse::initCurse(void)
-{
-    initscr();          // Start curses mode
-    start_color();      // Start the color functionality
-    cbreak();           // Line buffering disabled
-    keypad(stdscr, TRUE); // Needed?
-    noecho();           // echo off
-
-    //showColors();
-
-
-    initColors();
-    attron(COLOR_PAIR(1));
-
-#if 0
-    printw("Press 'Esc' to exit");
-    echo();
-    for (int i = strlen(str) - 1; i >= 0; i--)
-        ungetch(str[i]);
-    mvgetnstr(8, 1, buf, 10);
-    noecho();
-    refresh();
-    attroff(COLOR_PAIR(1));
-    curs_set(0);
-
-    createGridWindow();
-    createUsersWindows();
-    createDrawWindow();
-    
-    keypad(gridWin.subWin.win, TRUE);
-    
-    /* Get all the mouse events */
-    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-    printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
-
-#endif    
-
-    createSubWindows();
-}
-
-/**
- * End curses mode, i.e. restore normal terminal
- */
-void Curse::endCurse(void)
-{
-    endwin();
-}
-
 
 /**
  * Create a new window, does not show up anything on the screen.
@@ -389,36 +220,40 @@ void Curse::createSubWindows(void)
     // Users' windows
     for (size_t i = 0; i < NUM_PLAYERS; i++) {
         createWindow(userWin[i].subWin, 
-                        i ? USER2_WIN_Y : USER1_WIN_Y,
-                        i ? USER2_WIN_X : USER1_WIN_X,
-                        USER_WIN_LEN_Y, USER_WIN_LEN_X);
+                     i ? USER2_WIN_Y : USER1_WIN_Y,
+                     i ? USER2_WIN_X : USER1_WIN_X,
+                     USER_WIN_LEN_Y, USER_WIN_LEN_X);
     }
 
     // Draw window
     createWindow(drawWin.subWin, 
-                    DRAW_WIN_Y, DRAW_WIN_X, 
-                    DRAW_WIN_LEN_Y, DRAW_WIN_LEN_X);
+                 DRAW_WIN_Y, DRAW_WIN_X, 
+                 DRAW_WIN_LEN_Y, DRAW_WIN_LEN_X);
 }
 
 /**
  * Display user information (name, score, ..) on the screen.
  * @param uw user information structure
  */
-void Curse::showUserWindow(userWin_t& uw)
+void Curse::showUserWindow(userWin_t& uw, const char* infoText = NULL)
 {
     mvwaddnstr(uw.subWin.win, 0, 0, uw.playerName.c_str(), uw.subWin.lenx);
     mvwprintw(uw.subWin.win, 1, 0, "Playing %c", uw.symbol);
     mvwprintw(uw.subWin.win, 2, 0, "Score: %lu  ", uw.score);
+    if (infoText)
+        mvwaddnstr(uw.subWin.win, 3, 0, infoText, uw.subWin.lenx);
     wrefresh(uw.subWin.win);
 }
 
 /**
  * Display draws (ties) on the screen.
  */
-void Curse::showDrawWindow(void)
+void Curse::showDrawWindow(const char* infoText = NULL)
 {
     mvwaddnstr(drawWin.subWin.win, 0, 0, "Draws", drawWin.subWin.lenx);
     mvwprintw( drawWin.subWin.win, 1, 0, "%lu  ", drawWin.score);
+    if (infoText)
+        mvwaddnstr(drawWin.subWin.win, 2, 0, infoText, drawWin.subWin.lenx);
     wrefresh(drawWin.subWin.win);
 }
 
@@ -496,6 +331,59 @@ void Curse::getGridCoords(int cell, int& winy, int& winx)
     winx = (cell % CELLS_X) * SIZE_X + 1;
 }
 
+
+/**
+ * Get cell selection on the game board done by the user with mouse.
+ * @return selected cell number [0,8]
+ *         or 'Q' or 'q' to quit
+ */
+int Curse::getMove(void)
+{
+
+    int move;
+    bool done = false;
+    while(!done) {
+        MEVENT event;
+        int ch = wgetch(stdscr);
+        switch(ch) {
+            case KEY_MOUSE:
+                if ((getmouse(&event) == OK) && 
+                    (event.bstate & (BUTTON1_PRESSED | BUTTON1_CLICKED))) {
+                    // User made a mouse click
+                    done = ((move = getCellNumber(event.y, event.x)) >= 0);
+                }
+                break;
+            default: // Keyboard
+                move = ch;
+                if (move >= '1' && move <= '9') {
+                    move -= '1'; // -> binary [0,8]
+                    done = true;
+                } 
+                else if (move == 'q' || move == 'Q') {
+                    done = true;
+                }
+                break;
+        }
+        //mvprintw(INFO_Y, 1, "bstate=0x%x ch=%d    ", event.bstate, ch);
+    }
+    return move;
+}
+                          
+/**
+ * Set attribute (e.g. color, inverse video) of given cells.
+ * @param cells vector of cell numbers [0,8] on the game board
+ * @param colorPair color pair to set for the given cells
+ */
+void Curse::setCellsColor(std::vector<int>& cells, int colorPair)
+{
+    for (auto cell : cells) {
+        int winy, winx;
+        getGridCoords(cell, winy, winx);
+        mvwchgat(gridWin.subWin.win, winy, winx-1, 3, A_NORMAL, colorPair, NULL);
+    }
+    wrefresh(gridWin.subWin.win);
+}
+
 /**
  * Update game board on the screen according to the given game board content.
  * @param board symbols on the game board
@@ -516,10 +404,10 @@ void Curse::updateBoard(const boardMtx__t& newBoard)
 
     // Highlight the added symbols (if any) for a moment
     if (addedCells.size()) {
-        setCellsAttr(addedCells, HIGHLIGHT);
+        setCellsColor(addedCells, COLOR_HIGHLIGHT);
         sleepMilliseconds(500);
-        setCellsAttr(addedCells, NORMAL);
-        sleepMilliseconds(500);
+        setCellsColor(addedCells, COLOR_NORMAL);
+        sleepMilliseconds(100);
     } else {
         wrefresh(gridWin.subWin.win);
     }
@@ -532,8 +420,7 @@ void Curse::updateBoard(const boardMtx__t& newBoard)
 void Curse::showWinningLine(winLine__t& wl)
 {
     std::vector<int> vWinLine(wl.begin(), wl.end());
-    setCellsAttr(vWinLine, HIGHLIGHT);
-    getch();
+    setCellsColor(vWinLine, COLOR_HIGHLIGHT);
 }
 
 /**
@@ -544,7 +431,7 @@ std::string Curse::askPlayerName(int playerNumber)
 {
     assert(playerNumber >= 1 && playerNumber <= NUM_PLAYERS);
 
-    const size_t maxLen = 15;
+    const size_t maxLen = USER_WIN_LEN_X;
     char askBuf[maxLen + 1];
     const char queryTxt[] = "Enter player %d name: ";
 
@@ -564,8 +451,10 @@ std::string Curse::askPlayerName(int playerNumber)
     noecho();
     curs_set(0);
 
-    userWin[playerNumber -1].symbol = playerNumber == 1 ? 'X' : 'O';
+    userWin[playerNumber -1].symbol     = playerNumber == 1 ? 'X' : 'O';
+    userWin[playerNumber -1].score      = 0;
     userWin[playerNumber -1].playerName = askBuf;
+    drawWin.score = 0;
     return userWin[playerNumber - 1].playerName;
 }
 
@@ -659,17 +548,22 @@ bool Curse::askToPlayAgain(void)
     return (ch == 'Y');
 }
 
+/**
+ * Start to get mouse events
+ */
 void setMouseOn()
 {
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-    printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
-
+    //printf("\033[?1003h\n"); // Start reporting mouse movement events
 }
 
+/**
+ * Stop to get mouse events
+ */
 void setMouseOff()
 {
     mousemask(0, NULL);
-    printf("\033[?1003l\n"); // Disable mouse movement events, as l = low
+    //printf("\033[?1003l\n"); // Stop reporting mouse movement events
 }
 
 /**
@@ -679,17 +573,24 @@ void Curse::clear(void)
 {
     erase();
     refresh();
+
     gridVisible = false;
     std::fill(savedBoard.begin(), savedBoard.end(), ' ');
+
     setMouseOff();
     mouseIsOn = false;
-    turn = -1;
+
+    if (turn >= 0) {
+        wattron(userWin[turn].subWin.win, COLOR_PAIR(COLOR_NORMAL));
+        turn = -1;
+    }
+    wattron(drawWin.subWin.win, COLOR_PAIR(COLOR_NORMAL));
 }
 
 /**
  * Display the game board on the screen.
  */
-void Curse::showBoard(const boardMtx__t& pm, winLine__t& wl) 
+void Curse::showBoard(const boardMtx__t& pm) 
 {
     if (!gridVisible) {
         showGrid();
@@ -697,9 +598,6 @@ void Curse::showBoard(const boardMtx__t& pm, winLine__t& wl)
     }
 
     updateBoard(pm);
-
-    if (wl[0] >= 0)
-        showWinningLine(wl);
 
     if (!mouseIsOn) {
         setMouseOn();
@@ -713,13 +611,78 @@ void Curse::showBoard(const boardMtx__t& pm, winLine__t& wl)
  */
 void Curse::showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2)
 {
-    userWin[0].score = score1;
-    userWin[1].score = score2;
-    drawWin.score    = draws;
+    size_t score[NUM_PLAYERS] = {(size_t)score1, (size_t)score2};
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        userWin[i].score  = score[i];
+        showUserWindow(userWin[i]);
+    }
 
-    showUserWindow(userWin[0]);
-    showUserWindow(userWin[1]);
+    drawWin.score  = (size_t)draws;
     showDrawWindow();
 }
+
+/**
+ * Display game result (winner or draw, winning line).
+ */
+void Curse::showGameResult(winLine__t& winLine)
+{
+    if (winLine[0] >= 0) {
+
+        // we have a winner
+        char symbol = savedBoard[winLine[0]];
+        auto winner = playerNumberBySymbol(symbol);
+        if (turn != winner) {
+            wattron(userWin[turn].subWin.win, COLOR_PAIR(COLOR_NORMAL));
+            showUserWindow(userWin[turn]);
+        }
+        wattron(userWin[winner].subWin.win, COLOR_PAIR(COLOR_HIGHLIGHT));
+        showUserWindow(userWin[winner], "**WINNER**");
+
+        showWinningLine(winLine);
+
+    } else { 
+
+        // no winner but draw
+        wattron(userWin[turn].subWin.win, COLOR_PAIR(COLOR_NORMAL));
+        showUserWindow(userWin[turn]);
+        wattron(drawWin.subWin.win, COLOR_PAIR(COLOR_HIGHLIGHT));
+        showDrawWindow("*TIE*");
+    }
+
+}
+
+/**
+ * Ask for an user interaction to start a new game.
+ */
+bool Curse::askReadyForNewGame()
+{
+    purgeInput();
+    char answer = getch();
+    if (answer == '0' || toupper(answer) == 'Q')
+        return false;
+
+    return true;
+}
+
+/**
+ * Stop program execution for a while
+ * @param ms delay time in milliseconds
+ */
+void sleepMilliseconds(int ms)
+{
+    napms(ms);
+}
+
+/**
+ * 'Eat' everything (garbage) away possibly in standard input.
+ */
+void purgeInput()
+{
+    halfdelay(1);
+    while(getch() != ERR);
+    nocbreak();
+    cbreak();
+}
+
 
 

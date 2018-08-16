@@ -66,8 +66,8 @@ bool Engine::playOneBoard(int starter)
         turn = nextTurn(turn);
         
     } while (game->getGameState() == IN_PROGRESS__C);
-    
-    return true;
+
+    return ui->askReadyForNewGame();
 }
 
 /**

@@ -75,10 +75,8 @@ class Gui: public Curse, public UserIf
     /**
      * Display the game board on the screen.
      * @param mtx game board with symbols
-     * @param winLine cell indicies [0,8] of the winning line
-     *                if no winning line, indicies are -1
     */
-    void showBoard(const boardMtx__t& mtx, winLine__t& winLine);
+    void showBoard(const boardMtx__t& mtx);
 
     /**
      * Display scores on the screen.
@@ -89,6 +87,19 @@ class Gui: public Curse, public UserIf
      * @param score1 score of the player 2
      */
     void showScores(const std::string& name1, int score1, int draws, const std::string& name2, int score2);
+
+    /**
+     * Display game result (winner or draw, winning line).
+     * @param winLine winning line indices [0,8] on the game board
+     */
+    void showGameResult(winLine__t& winLine);
+
+    /**
+     * Ask for an user interaction to start a new game.
+     * @return true for a new game, false to quit
+     */
+    bool askReadyForNewGame();
+
 };
 
 #endif
