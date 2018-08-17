@@ -1,9 +1,17 @@
-CXX := g++
-CXXFLAGS := -Wall -g -std=c++11
-TARGET := ttt
-#LFLAGS := -ggdb
-LFLAGS := -lncurses
-RM := rm -f
+ifndef ($(nogui))
+ nogui = 0
+endif
+
+RM 		  := rm -f
+TARGET 	  := ttt
+CXX 	  := g++
+CXXFLAGS  := -Wall -g -std=c++11
+LFLAGS    := 
+ifneq (0, $(nogui))
+ CXXFLAGS += -DNOGUI
+else 
+ LFLAGS   += -lncurses
+endif
 
 CXXEXT	 = cc
 OBJEXT	 = o
@@ -11,14 +19,20 @@ DEPEXT	 = d
 SRCDIR   = src
 BUILDDIR = build
 
-#ifeq (0,$(gui))
-# xxx = "gui == 0"
-#else 
-# xxx = "gui != 0"
-#endif
-
 # $(wildcard xxx/*.cc): get all .cc files in the directory xxx/"
-SRCS := $(wildcard $(SRCDIR)/*.$(CXXEXT))
+#SRCS := $(wildcard $(SRCDIR)/*.$(CXXEXT))
+SRCS    := $(SRCDIR)/ttt.cc \
+           $(SRCDIR)/engine.cc \
+		   $(SRCDIR)/game.cc \
+		   $(SRCDIR)/console.cc \
+		   $(SRCDIR)/computermove.cc \
+		   $(SRCDIR)/rules.cc
+GUISRCS := $(SRCDIR)/gui.cc \
+           $(SRCDIR)/curse.cc
+ifeq (0,$(nogui))
+  SRCS += $(GUISRCS)
+endif
+
 #OBJS = get each from SRCS by replacing extension CXXEXT with OBJEXT
 #       and directory part by BUILDDIR
 OBJS := $(addprefix $(BUILDDIR)/, $(patsubst %.$(CXXEXT),%.$(OBJEXT),$(notdir $(SRCS))))
@@ -26,13 +40,9 @@ OBJS := $(addprefix $(BUILDDIR)/, $(patsubst %.$(CXXEXT),%.$(OBJEXT),$(notdir $(
 DEPS := $(OBJS:.$(OBJEXT)=.$(DEPEXT))
 
 
-.PHONY: clean all
+.PHONY: show clean all 
 
 all: $(TARGET)
-#	@echo "xxx: " $(xxx)
-#	@echo $(SRCS)
-#	@echo "OBJS: " $(OBJS)
-#	@echo "DEPS: " $(DEPS)
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(LFLAGS) -o $(TARGET)
@@ -50,3 +60,10 @@ $(BUILDDIR)/%.$(DEPEXT): $(SRCDIR)/%.$(CXXEXT)
 clean:
 	$(RM) $(OBJS) $(DEPS) $(TARGET)
 
+show:
+	@echo "nogui: " $(nogui)
+	@echo "CXXFLAGS: " $(CXXFLAGS)
+	@echo "LFLAGS:   " $(LFLAGS)
+	@echo "SRCS: " $(SRCS)
+	@echo "OBJS: " $(OBJS)
+#	@echo "DEPS: " $(DEPS)
