@@ -2,7 +2,7 @@
  * @file    ttt.h
  * @author  Pekka Koivuniemi
  * @date    6 April 2018
- * @version 0.1
+ * @version 0.2
  * @brief   This header file contains general definitions of the program.
  */
 
