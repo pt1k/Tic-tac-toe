@@ -79,7 +79,7 @@ How to make your moves it depends on which user interface being used, either tex
 A player is asked to make his/her move by entering the cell number 1-9 for the move.
 By entering 0 (zero) the current game quits and next players are asked.
 
-#### Graphical user Interface
+#### Graphical User Interface
 
 The player whose turn it is, is highlighted on the screen. A move is done by a mouse click at a cell on the game grid. 
 
