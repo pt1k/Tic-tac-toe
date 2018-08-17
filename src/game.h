@@ -2,7 +2,7 @@
  * @file    game.h
  * @author  Pekka Koivuniemi
  * @date    6 April 2018
- * @version 0.1
+ * @version 0.2
  * @brief   The definitions of the game class.
  */
 
