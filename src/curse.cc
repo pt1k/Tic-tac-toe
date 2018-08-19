@@ -186,7 +186,7 @@ void initColors(void)
 {
     init_pair(COLOR_NORMAL,    COLOR_CYAN,  COLOR_BLACK);
     init_pair(COLOR_HIGHLIGHT, COLOR_WHITE, COLOR_BLACK);
-    init_pair(COLOR_QUERY,     COLOR_BLUE,  COLOR_BLACK);
+    init_pair(COLOR_QUERY,     COLOR_CYAN,  COLOR_BLACK);
     init_pair(COLOR_WIN,       COLOR_BLACK, COLOR_GREEN);
     init_pair(COLOR_DRAW,      COLOR_BLACK, COLOR_YELLOW);
     init_pair(COLOR_LOSE,      COLOR_BLACK, COLOR_RED);
