@@ -1,6 +1,6 @@
 # Tic-tac-toe console game
 
-This is an unbeatable tic-tac-toe console game written in C++.
+This is an unbeatable tic-tac-toe Linux console game written in C++.
 
 ## Motivation
 
@@ -24,12 +24,13 @@ Clone the Tic-tac-toe repository, compile, and run the game executable on your L
 
 c++11 support required in g++ compiler.
 
-For GUI (Graphical User Interface), ncurses is preferred to be installed in the system.
+For more convenient user interface, ncurses is preferred to be installed in the system.
 ncurses 5.0 or higher should work fine.
-However, it is possible to compile without ncurses. In this case, user interface is the text based Linux terminal.
+However, it is possible to compile without ncurses. In this case a poor man's rugged user interface is used.
 
-Tested in Linux Ubuntu 16.04 with g++ 5.4.0 and ncurses 6.0.20160213.
-
+Tested in environments:
+  - Linux Ubuntu 16.04, ncurses 6.0.20160213
+  - Windows 10, Cygwin 2.10.0, ncurses 6.0.20171125
 
 ### Installing
 
@@ -42,11 +43,11 @@ Move to the game directory:
 ```
 cd Tic-tac-toe
 ```
-Compile to produce executable hasing GUI:
+Compile to produce executable with ncurses:
 ```
 make
 ```
-Alternatively, compiling without ncurses to produce the executable without GUI:
+Alternatively, compiling without ncurses:
 ```
 make nogui=1
 ```
@@ -72,14 +73,14 @@ The program can be quit at any stage by pressing ctrl-C.
 
 ### Playing the game
 
-How to make your moves it depends on which user interface being used, either text based Linux terminal or Graphical user Interface.
+How to make your moves it depends on which user interface being used.
 
-#### Text based Linux Terminal
+#### Poor Linux Terminal without ncurses
 
 A player is asked to make his/her move by entering the cell number 1-9 for the move.
 By entering 0 (zero) the current game quits and next players are asked.
 
-#### Graphical User Interface
+#### ncurses  User Interface
 
 The player whose turn it is, is highlighted on the screen. A move is done by a mouse click at a cell on the game grid. 
 
